@@ -1,13 +1,16 @@
 package handlers
 
 import (
+	"errors"
 	"net/http"
+	"time"
 
+	"gin-user-management/database"
+	"gin-user-management/helpers"
 	"gin-user-management/models"
 
 	"github.com/gin-gonic/gin"
 
-	// "go.elastic.co/apm/v2/model"
 	"gorm.io/gorm"
 )
 
@@ -16,72 +19,125 @@ type UserHandler struct {
 	DB *gorm.DB
 }
 
-// NewUserHandler buat instance handler
-func NewUserHandler(db *gorm.DB) *UserHandler {
-	return &UserHandler{DB: db}
+func NewUserHandler() *UserHandler {
+	return &UserHandler{
+		DB: database.DB, // Pastikan ini mengambil database yang sudah diinisialisasi
+	}
 }
 
 // GetUsers mendapatkan semua user
 func (h *UserHandler) GetUsers(c *gin.Context) {
 	var users []models.User
-	h.DB.Find(&users)
-	c.JSON(http.StatusOK, users)
+	result := database.DB.Find(&users)
+	if result.Error != nil {
+		helpers.JSONResponse(c, http.StatusInternalServerError, "Gagal mengambil data pengguna", nil)
+		return
+	}
+
+	if len(users) == 0 {
+		helpers.JSONResponse(c, http.StatusOK, "Belum ada data pengguna ditemukan", nil)
+		return
+	}
+
+	helpers.JSONResponse(c, http.StatusOK, "Data pengguna berhasil diambil", users)
 }
 
 // GetUserByID mendapatkan user berdasarkan ID
 func (h *UserHandler) GetUserByID(c *gin.Context) {
-	id := c.Param("id")
-	var user []models.User
+	id := c.Param("id") // Ambil ID dari parameter URL
 
+	var user models.User
 	if err := h.DB.First(&user, id).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			helpers.JSONResponse(c, http.StatusNotFound, "User not found", nil)
+			return
+		}
+		helpers.JSONResponse(c, http.StatusInternalServerError, "Failed to retrieve user", nil)
 		return
 	}
 
-	c.JSON(http.StatusOK, user)
+	// Berikan respons sukses
+	helpers.JSONResponse(c, http.StatusOK, "User retrieved successfully", user)
 }
 
 // CreateUser menambahkan user baru
 func (h *UserHandler) CreateUser(c *gin.Context) {
-	var user []models.User
+	var user models.User
+
+	// Binding JSON ke struct user
 	if err := c.ShouldBindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		helpers.JSONResponse(c, http.StatusBadRequest, "Invalid request data", nil)
 		return
 	}
 
-	h.DB.Create(&user)
-	c.JSON(http.StatusCreated, user)
+	// Cek apakah email sudah digunakan
+	var existingUser models.User
+	if err := h.DB.Where("email = ?", user.Email).First(&existingUser).Error; err == nil {
+		helpers.JSONResponse(c, http.StatusConflict, "Email already exists", nil)
+		return
+	}
+
+	// Simpan user ke database
+	if err := h.DB.Create(&user).Error; err != nil {
+		helpers.JSONResponse(c, http.StatusInternalServerError, "Failed to create user", nil)
+		return
+	}
+
+	helpers.JSONResponse(c, http.StatusCreated, "User created successfully", user)
 }
 
 // UpdateUser mengupdate data user
 func (h *UserHandler) UpdateUser(c *gin.Context) {
-	id := c.Param("id")
-	var user []models.User
+	id := c.Param("id") // Ambil ID dari parameter URL
 
+	var user models.User
 	if err := h.DB.First(&user, id).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			helpers.JSONResponse(c, http.StatusNotFound, "User not found", nil)
+			return
+		}
+		helpers.JSONResponse(c, http.StatusInternalServerError, "Failed to retrieve user", nil)
 		return
 	}
 
-	if err := c.ShouldBindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	var updateData models.User
+	if err := c.ShouldBindJSON(&updateData); err != nil {
+		helpers.JSONResponse(c, http.StatusBadRequest, "Invalid request data", nil)
 		return
 	}
 
-	h.DB.Save(&user)
-	c.JSON(http.StatusOK, user)
+	// Update data user yang ditemukan
+	user.Name = updateData.Name
+	user.Email = updateData.Email
+	user.UpdatedAt = time.Now().Unix() // Update timestamp
+
+	if err := h.DB.Save(&user).Error; err != nil {
+		helpers.JSONResponse(c, http.StatusInternalServerError, "Failed to update user", nil)
+		return
+	}
+
+	helpers.JSONResponse(c, http.StatusOK, "User updated successfully", user)
 }
 
 // DeleteUser menghapus user
 func (h *UserHandler) DeleteUser(c *gin.Context) {
-	id := c.Param("id")
-	var user []models.User
+	id := c.Param("id") // Ambil ID dari parameter URL
 
+	var user models.User
 	if err := h.DB.First(&user, id).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			helpers.JSONResponse(c, http.StatusNotFound, "User not found", nil)
+			return
+		}
+		helpers.JSONResponse(c, http.StatusInternalServerError, "Failed to retrieve user", nil)
 		return
 	}
 
-	h.DB.Delete(&user)
-	c.JSON(http.StatusOK, gin.H{"message": "User deleted"})
+	// Hapus user
+	if err := h.DB.Delete(&user).Error; err != nil {
+		helpers.JSONResponse(c, http.StatusInternalServerError, "Failed to delete user", nil)
+		return
+	}
+
+	helpers.JSONResponse(c, http.StatusOK, "User deleted successfully", nil)
 }

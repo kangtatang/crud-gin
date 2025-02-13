@@ -3,16 +3,18 @@ package main
 import (
 	"log"
 
+	"gin-user-management/database"
 	"gin-user-management/handlers"
 
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	db := InitDB()
+	// db := database.InitDB()
+	database.InitDB()
 	r := gin.Default()
 
-	userHandler := handlers.NewUserHandler(db) // Gunakan handlers.NewUserHandler
+	userHandler := handlers.NewUserHandler() // Gunakan handlers.NewUserHandler
 
 	r.GET("/users", userHandler.GetUsers)
 	r.GET("/users/:id", userHandler.GetUserByID)
