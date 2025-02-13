@@ -1,9 +1,13 @@
-package main
+package handlers
 
 import (
 	"net/http"
 
+	"gin-user-management/models"
+
 	"github.com/gin-gonic/gin"
+
+	// "go.elastic.co/apm/v2/model"
 	"gorm.io/gorm"
 )
 
@@ -19,7 +23,7 @@ func NewUserHandler(db *gorm.DB) *UserHandler {
 
 // GetUsers mendapatkan semua user
 func (h *UserHandler) GetUsers(c *gin.Context) {
-	var users []User
+	var users []models.User
 	h.DB.Find(&users)
 	c.JSON(http.StatusOK, users)
 }
@@ -27,7 +31,7 @@ func (h *UserHandler) GetUsers(c *gin.Context) {
 // GetUserByID mendapatkan user berdasarkan ID
 func (h *UserHandler) GetUserByID(c *gin.Context) {
 	id := c.Param("id")
-	var user User
+	var user []models.User
 
 	if err := h.DB.First(&user, id).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
@@ -39,7 +43,7 @@ func (h *UserHandler) GetUserByID(c *gin.Context) {
 
 // CreateUser menambahkan user baru
 func (h *UserHandler) CreateUser(c *gin.Context) {
-	var user User
+	var user []models.User
 	if err := c.ShouldBindJSON(&user); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -52,7 +56,7 @@ func (h *UserHandler) CreateUser(c *gin.Context) {
 // UpdateUser mengupdate data user
 func (h *UserHandler) UpdateUser(c *gin.Context) {
 	id := c.Param("id")
-	var user User
+	var user []models.User
 
 	if err := h.DB.First(&user, id).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
@@ -71,7 +75,7 @@ func (h *UserHandler) UpdateUser(c *gin.Context) {
 // DeleteUser menghapus user
 func (h *UserHandler) DeleteUser(c *gin.Context) {
 	id := c.Param("id")
-	var user User
+	var user []models.User
 
 	if err := h.DB.First(&user, id).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})

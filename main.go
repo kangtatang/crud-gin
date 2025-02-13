@@ -3,26 +3,22 @@ package main
 import (
 	"log"
 
+	"gin-user-management/handlers"
+
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	// Inisialisasi database
 	db := InitDB()
-
-	// Inisialisasi Gin
 	r := gin.Default()
 
-	// Inisialisasi handler dengan database
-	userHandler := NewUserHandler(db)
+	userHandler := handlers.NewUserHandler(db) // Gunakan handlers.NewUserHandler
 
-	// Routing user management
 	r.GET("/users", userHandler.GetUsers)
 	r.GET("/users/:id", userHandler.GetUserByID)
 	r.POST("/users", userHandler.CreateUser)
 	r.PUT("/users/:id", userHandler.UpdateUser)
 	r.DELETE("/users/:id", userHandler.DeleteUser)
 
-	// Menjalankan server
 	log.Fatal(r.Run(":8080"))
 }

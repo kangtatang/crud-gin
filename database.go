@@ -1,21 +1,24 @@
-package main
+package main // Atau sesuaikan jika menggunakan package lain
 
 import (
+	"gin-user-management/models" // ✅ Import package models
 	"log"
 
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
-// InitDB inisialisasi koneksi database
+var db *gorm.DB
+
 func InitDB() *gorm.DB {
-	db, err := gorm.Open(sqlite.Open("users.db"), &gorm.Config{})
+	var err error
+	db, err = gorm.Open(sqlite.Open("users.db"), &gorm.Config{})
 	if err != nil {
-		log.Fatal("Failed to connect to database")
+		log.Fatal("Failed to connect to database:", err)
 	}
 
-	// Auto Migrate table
-	db.AutoMigrate(&User{})
+	// ✅ Panggil models.User dengan prefix package
+	db.AutoMigrate(&models.User{})
 
 	return db
 }
