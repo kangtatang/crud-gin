@@ -112,6 +112,91 @@ Aplikasi ini dibuat sebagai bahan referensi belajar bagi pemula yang sedang bela
 ├── README.md   # Dokumentasi proyek
 ```
 
+# Gin User Management
+
+Gin User Management adalah aplikasi CRUD berbasis Golang menggunakan Gin dan GORM dengan PostgreSQL sebagai database.
+
+## 📌 Fitur
+- **CRUD User**: Tambah, edit, hapus, dan ambil data user.
+- **Custom Response**: Menggunakan helper untuk standar respons API.
+- **Konfigurasi dengan .env**: Menggunakan environment variables.
+- **Auto Migrate Database**: Migrasi otomatis saat aplikasi dijalankan.
+
+## ⚙️ Konfigurasi
+Buat file `.env` di root project dengan isi berikut:
+
+```ini
+DB_HOST=localhost
+DB_USER=postgres
+DB_PASSWORD=yourpassword
+DB_NAME=yourdbname
+DB_PORT=5432
+APP_PORT=8080
+```
+
+## 🛠 Cara Menjalankan di Windows
+```sh
+go run main.go
+```
+
+
+## 🚀 Build dan Run Aplikasi
+
+### **1️⃣ Build untuk Windows**
+```sh
+go build -o gin-user-app.exe main.go
+```
+Jalankan:
+```sh
+gin-user-app.exe
+```
+
+### **2️⃣ Build untuk Linux (Cross-Compilation di Windows)**
+```sh
+set GOOS=linux
+set GOARCH=amd64
+go build -o gin-user-app main.go
+```
+Transfer file ke server Linux:
+```sh
+scp gin-user-app user@your-server-ip:/home/user/
+```
+
+### **3️⃣ Jalankan Aplikasi di Linux**
+```sh
+ssh user@your-server-ip
+cd /home/user/
+chmod +x gin-user-app
+./gin-user-app
+```
+
+### **4️⃣ Jalankan Aplikasi sebagai Service (Opsional)**
+Buat file systemd:
+```sh
+sudo nano /etc/systemd/system/gin-user.service
+```
+Isi dengan:
+```ini
+[Unit]
+Description=Gin User Management Service
+After=network.target
+
+[Service]
+ExecStart=/home/user/gin-user-app
+WorkingDirectory=/home/user
+Restart=always
+User=user
+
+[Install]
+WantedBy=multi-user.target
+```
+Simpan dan aktifkan:
+```sh
+sudo systemctl daemon-reload
+sudo systemctl enable gin-user.service
+sudo systemctl start gin-user.service
+```
+
 ## 📜 Lisensi
 Proyek ini berlisensi di bawah **MIT License**.
 
