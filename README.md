@@ -1,5 +1,7 @@
 # Gin User Management
 
+Gin User Management adalah aplikasi CRUD berbasis Golang menggunakan Gin dan GORM dengan PostgreSQL sebagai database.
+
 Aplikasi **Gin User Management** adalah REST API sederhana yang dibangun menggunakan **Golang**, **Gin**, dan **GORM** untuk mengelola pengguna. API ini mencakup operasi CRUD (Create, Read, Update, Delete) pada entitas pengguna, saat ini tanpa menggunakan middleware.
 
 Aplikasi ini dibuat sebagai bahan referensi belajar bagi pemula yang sedang belajar Golang dengan menggunakan Gin Framework. 
@@ -10,6 +12,8 @@ Aplikasi ini dibuat sebagai bahan referensi belajar bagi pemula yang sedang bela
 - **Mendapatkan detail pengguna berdasarkan ID** (Get User by ID)
 - **Memperbarui data pengguna** (Update User)
 - **Menghapus pengguna** (Delete User)
+- **Konfigurasi dengan .env: Menggunakan environment variables**.
+- **Auto Migrate Database: Migrasi otomatis saat aplikasi dijalankan**.
 
 ## 🛠️ Teknologi yang Digunakan
 - **Golang** sebagai bahasa pemrograman utama
@@ -111,16 +115,6 @@ Aplikasi ini dibuat sebagai bahan referensi belajar bagi pemula yang sedang bela
 ├── go.mod   # Dependency management
 ├── README.md   # Dokumentasi proyek
 ```
-
-# Gin User Management
-
-Gin User Management adalah aplikasi CRUD berbasis Golang menggunakan Gin dan GORM dengan PostgreSQL sebagai database.
-
-## 📌 Fitur
-- **CRUD User**: Tambah, edit, hapus, dan ambil data user.
-- **Custom Response**: Menggunakan helper untuk standar respons API.
-- **Konfigurasi dengan .env**: Menggunakan environment variables.
-- **Auto Migrate Database**: Migrasi otomatis saat aplikasi dijalankan.
 
 ## ⚙️ Konfigurasi
 Buat file `.env` di root project dengan isi berikut:
