@@ -20,7 +20,7 @@ Aplikasi ini dibuat sebagai bahan referensi belajar bagi pemula yang sedang bela
 ## 📦 Instalasi
 1. **Clone repository ini**
    ```sh
-   git clone https://github.com/username/gin-user-management.git
+   git clone https://github.com/kangtatang/gin-user-management.git
    cd gin-user-management
    ```
 2. **Instal dependency**
@@ -118,4 +118,4 @@ Proyek ini berlisensi di bawah **MIT License**.
 ## 🤝 Kontribusi
 Silakan buat **Pull Request** jika ingin berkontribusi atau melaporkan masalah.
 
-kantak saya di : kang.tatang@yahoo.co.id
+>kontak saya di : kang.tatang@yahoo.co.id
